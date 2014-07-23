@@ -1,0 +1,9 @@
+time message  pid
+1000 starting 1
+1001 starting 2
+1002 finishing 2
+1003 starting 3
+1004 finishing 1
+1010 finishing 4
+1003 starting 5
+1003 starting 9
