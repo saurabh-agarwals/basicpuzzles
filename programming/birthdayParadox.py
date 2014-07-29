@@ -2,6 +2,7 @@ import urllib2
 from BeautifulSoup import BeautifulSoup
 import re
 from datetime import datetime
+import collections
 
 '''
 we need to find out find how many teams out of the 32 have at least 2 
@@ -27,7 +28,6 @@ def getPlayersDataFromWiki():
 def getPlayersList():
 	playersList = []
 	teams = getTeamsByCountry()
-	print len(teams)
 	for team in teams:
 		for row in team['playersTable'].findAll("tr"):
 			cells = row.findAll("td")
@@ -79,7 +79,6 @@ def getAllCountryName():
 def getPlayersListByCountry():
 	playersList = []
 	teams = getTeamsByCountry()
-	print len(teams)
 	for team in teams:
 		initTeam = {team['country']:[]}
 		#initTeam = [{team['country']:{[]}]
@@ -88,6 +87,7 @@ def getPlayersListByCountry():
 			if len(cells) > 0:
 				name = cells[2].find(text=True)
 				bday = cells[3].find("span", { "class" : "bday" }).find(text=True)
+				#bday = datetime.strptime(bday, '%Y-%m-%d').strftime('%-d %B %Y')
 				bday = datetime.strptime(bday, '%Y-%m-%d').strftime('%-d %B')
 				club = cells[5].findChildren()[3].find(text=True)
 				#eachProcess = {'name':name, 'bday':bday,'club':club}
@@ -101,6 +101,7 @@ def findCommandBithday():
 	newList = {}
 	birthDayList = []
 	birthDayListByCountry = getPlayersListByCountry()
+	print birthDayListByCountry
 	count = len(birthDayListByCountry)
 	for index, playersByCountry in enumerate(birthDayListByCountry):
 		for jindex, element in enumerate(birthDayListByCountry):
@@ -127,6 +128,25 @@ def findCommandBithday():
 		'''
 	return newList
 
-findCommandBithday()
+def findComman():	
+	newList = []
+	count = 0
+	birthDayList = []
+	birthDayListByCountry = getPlayersListByCountry()
+	#print birthDayListByCountry
+	for index, item in enumerate(birthDayListByCountry):
+		cout = birthDayListByCountry[index].values()[0]
+		process =  {birthDayListByCountry[index].keys()[0]:[x for x, y in collections.Counter(cout).items() if y > 1]}
+		newList.append(process)
+
+	for i in newList:		
+		if len(i.values()[0])>=2:
+			count = count + 1
+			print i.keys()[0] + " : " + "True" + " " + str(i.values()[0])
+		#else:
+			#print i.keys()[0] + " : " + "False" + " " + str(i.values()[0])
+	print "Total Number of countries is" + " " + str(count)
+
+findComman()
 
 
