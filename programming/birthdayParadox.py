@@ -11,8 +11,9 @@ players who share the same birthday.
 
 template = "{0:10} {1:20} {2:30} {3:40}"
 data = open("fifa.html",'r').read()
-soup = BeautifulSoup(data)
-#soup = getPlayersDataFromWiki()
+soup = None
+#soup = BeautifulSoup(data)
+
 
 
 def setGlobalVaribales():
@@ -44,7 +45,7 @@ def getTeamsByCountry():
 	tables = soup.findAll("table")
 	teamList = []
 	for table in tables:
-		team = table.find("table", { "class" : "sortable jquery-tablesorter" })		
+		team = table.find("table", { "class" : "sortable" })		
 		if team:			
 			myTeam = {'country':listOfCountries[0],'playersTable':team}
 			teamList.append(myTeam)
@@ -92,16 +93,34 @@ def getPlayersListByCountry():
 				club = cells[5].findChildren()[3].find(text=True)
 				#eachProcess = {'name':name, 'bday':bday,'club':club}
 				#eachProcess = {'bday':bday}
+				#eachProcess = {bday:name}
 				eachProcess = bday
 				initTeam[team['country']].append(eachProcess)
 		playersList.append(initTeam)
 	return playersList
 
+
+def findCommanBithdayInTeam():	
+	newList = []
+	count = 0
+	birthDayListByCountry = getPlayersListByCountry()
+	for index, item in enumerate(birthDayListByCountry):
+		cout = birthDayListByCountry[index].values()[0]
+		process =  {birthDayListByCountry[index].keys()[0]:[x for x, y in collections.Counter(cout).items() if y > 1]}
+		newList.append(process)
+
+	for i in newList:		
+		if len(i.values()[0])>=1:
+			count = count + 1
+			print i.keys()[0] + " : " + "True" + " " + str(i.values()[0])
+		#else:
+			#print i.keys()[0] + " : " + "False" + " " + str(i.values()[0])
+	print "Total Number of countries is" + " " + str(count)
+
 def findCommandBithday():	
 	newList = {}
 	birthDayList = []
 	birthDayListByCountry = getPlayersListByCountry()
-	print birthDayListByCountry
 	count = len(birthDayListByCountry)
 	for index, playersByCountry in enumerate(birthDayListByCountry):
 		for jindex, element in enumerate(birthDayListByCountry):
@@ -128,25 +147,7 @@ def findCommandBithday():
 		'''
 	return newList
 
-def findComman():	
-	newList = []
-	count = 0
-	birthDayList = []
-	birthDayListByCountry = getPlayersListByCountry()
-	#print birthDayListByCountry
-	for index, item in enumerate(birthDayListByCountry):
-		cout = birthDayListByCountry[index].values()[0]
-		process =  {birthDayListByCountry[index].keys()[0]:[x for x, y in collections.Counter(cout).items() if y > 1]}
-		newList.append(process)
-
-	for i in newList:		
-		if len(i.values()[0])>=2:
-			count = count + 1
-			print i.keys()[0] + " : " + "True" + " " + str(i.values()[0])
-		#else:
-			#print i.keys()[0] + " : " + "False" + " " + str(i.values()[0])
-	print "Total Number of countries is" + " " + str(count)
-
-findComman()
+setGlobalVaribales()
+findCommanBithdayInTeam()
 
 
